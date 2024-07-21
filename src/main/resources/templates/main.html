@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Student</title>
+    <script src="/jquery/jquery-3.7.1.min.js"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
+    <link rel="stylesheet" href="/css/main.css"/>
+    <style>
+        body {
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+            justify-content: center;
+            margin: 0 auto;
+            font-family: Arial, sans-serif;
+        }
+
+        .studentName {
+            cursor: pointer;
+            font-weight: 700;
+            color: dodgerblue;
+        }
+
+        .studentName:hover {
+            background-color: dodgerblue;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            width: 60%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .submitBtn {
+            color: white;
+            background-color: deepskyblue;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .submitBtn:hover {
+            background-color: dodgerblue;
+        }
+
+        form label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        form input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        form button[type="submit"] {
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1em;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        table thead tr {
+            background-color: #009879;
+            color: #ffffff;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        table th,
+        table td {
+            padding: 12px 15px;
+        }
+
+        table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+
+        table tbody tr:last-of-type {
+            border-bottom: 2px solid #009879;
+        }
+
+        table tbody tr.active-row {
+            font-weight: bold;
+            color: #009879;
+        }
+
+        .controlBox{
+            display: flex;
+            justify-content: space-evenly;
+        }
+
+        .longBtn{
+            height: 40px;
+            width:40%;
+            border: 1px solid darkgray;
+            border-radius: 10px;
+            background-color: #008fd9;
+            color:white;
+        }
+
+        .longBtn:hover{
+            background-color: dodgerblue;
+            color:white;
+        }
+
+        .search-box {
+            height: 2.5em;
+            width: 95%;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            border: none;
+            box-shadow:  2px 2px 2px #197c19;
+            margin: 1em;
+        }
+
+        .deleteBtn{
+            background-color: #db5151;
+        }
+
+    </style>
+</head>
+<body>
+<h2>학생 정보</h2>
+<label for="search">
+    <input type="text" id="search" class="search-box" placeholder="학생명을 입력하세요"/>
+</label>
+<div class="controlBox">
+<button type="button" id="searchBtn" class="longBtn">검 색</button>
+<button type="button" id="addBtn" class="longBtn">추 가</button>
+</div>
+<table id="studentTable">
+    <thead>
+    <tr>
+        <th>학번</th>
+        <th>이름</th>
+        <th>주소</th>
+        <th>학교</th>
+        <th>전공</th>
+        <th>작업</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="student : ${students}">
+        <td class="studentId" th:text="${student.id}">ID</td>
+        <td class="studentName" th:text="${student.name}">Name</td>
+        <td class="studentAddress" th:text="${student.address}">Address</td>
+        <td class="studentSchool" th:text="${student.school}">School</td>
+        <td class="studentMajor" th:text="${student.major}">Major</td>
+        <td><button type="button" class="deleteBtn submitBtn">삭제</button></td>
+    </tr>
+    </tbody>
+</table>
+
+<div id="addModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>학생 추가</h2>
+        <form id="addStudentForm" action="/students/add" method="post">
+            <label for="name">이름:</label>
+            <input type="text" id="name" name="name" required><br><br>
+            <label for="address">주소:</label>
+            <input type="text" id="address" name="address" required><br><br>
+            <label for="school">학교:</label>
+            <input type="text" id="school" name="school" required><br><br>
+            <label for="major">전공:</label>
+            <input type="text" id="major" name="major" required><br><br>
+            <button type="submit" class="longBtn">추가</button>
+        </form>
+    </div>
+</div>
+
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>학생 정보 수정</h2>
+        <form id="editStudentForm" action="/students/edit" method="post">
+            <input type="hidden" id="editId" name="id">
+            <label for="editName">이름:</label>
+            <input type="text" id="editName" name="name" required><br><br>
+            <label for="editAddress">주소:</label>
+            <input type="text" id="editAddress" name="address" required><br><br>
+            <label for="editSchool">학교:</label>
+            <input type="text" id="editSchool" name="school" required><br><br>
+            <label for="editMajor">전공:</label>
+            <input type="text" id="editMajor" name="major" required><br><br>
+            <button type="submit" class="longBtn">수정</button>
+        </form>
+    </div>
+</div>
+<script>
+    $("#addBtn").click(function() {
+        console.log("추가 버튼 클릭됨");
+        $("#addModal").css("display", "block");
+    });
+
+    $(".close").click(function() {
+        $(".modal").css("display", "none");
+    });
+
+    $("#searchBtn").click(function() {
+        const name = $("#search").val();
+        console.log(name)
+        $.ajax({
+            url: `/search?name=${name}`,
+            type: 'GET',
+            success: function(students) {
+                const tbody = $("#studentTable tbody");
+                tbody.empty();
+                students.forEach(student => {
+                    tbody.append(`
+                        <tr>
+                            <td>${student.id}</td>
+                            <td>${student.name}</td>
+                            <td>${student.address}</td>
+                            <td>${student.school}</td>
+                            <td>${student.major}</td>
+                            <td><button type="button" class="deleteBtn submitBtn">삭제</button></td>
+                        </tr>
+                    `);
+                });
+            },
+            error: function(err) {
+                console.error(err);
+            }
+        });
+    });
+</script>
+</body>
+</html>
